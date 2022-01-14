@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Tic - Tac - Toe</title>
+</head>
+<body>
+    <nav id="nav-bar">
+      <ul>
+          <li class="Title">NICCO</li>
+         <div class="button-container">
+          <li><button class="nav-button" id="computer-mode">COMPUTER</button></li>
+          <li><button class="nav-button" id="two-player-mode">2 - PLAYER</button></li>
+          <li><button class="nav-button" id="settings-button">SETTINGS</button></li>
+        </div>
+      </ul>
+    </nav>
+
+    <div class="grid-container">
+        <div id="game-grid">
+            <div class="game-square">T</div>
+            <div class="game-square">I</div>
+            <div class="game-square">C</div>
+
+            <div class="game-square">T</div>
+            <div class="game-square">A</div>
+            <div class="game-square">C</div>
+
+            <div class="game-square">T</div>
+            <div class="game-square">O</div>
+            <div class="game-square">E</div>
+        </div>
+    </div>
+
+    <div id="popup-form" class="">
+        <form id="settings-form">
+            <div>
+                <label for="user-one-name">USER ONE NAME</label>
+                <input type="text" id="user-one-name" required maxlength="25">
+            </div>
+            <div>
+                <label for="user-two-name">USER TWO NAME</label>
+                <input type="text" id="user-two-name" required maxlength="25">
+            </div>
+            <div>
+                <label for="user-one-mark">USER ONE MARK</label>
+                <input type="text" id="user-one-mark" required maxlength="1" placeholder="X" class="one-char">
+                <label for="user-two-mark">USER TWO MARK</label>
+                <input type="text" id="user-two-mark" required maxlength="1" placeholder="O" class="one-char">
+            </div>
+            <div>
+                <button type="reset">Reset</button>
+                <button type="submit" id="form-submit-button">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="footer">
+        <p>Fin</p>
+    </div>
+</body>
+</html>
