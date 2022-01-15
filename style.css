@@ -145,19 +145,16 @@ body {
 }
 
 #popup-form.open {
-    animation: open 0.7s forwards;
+    animation: open 0.5s forwards;
 }
 
 #popup-form.close {
-    animation: close 0.7s forwards
+    animation: close 0.5s forwards
 }
 
 @keyframes close {
     0% {
         transform: translate(-50%,-50%) scale(1);
-    }
-    50% {
-        transform: translate(-50%,-50%) scale(0.2);
     }
     100% {
         transform: translate(-50%,-50%) scale(0);

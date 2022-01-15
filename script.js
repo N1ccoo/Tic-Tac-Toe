@@ -6,28 +6,21 @@ const gameSettings = (() => {
 
     settingsBtn.addEventListener('click',openForm)
 
-
     function closeForm(e) {
-        e.preventDefault()
         let path = e.composedPath();
-        const withinBoundaries = path.includes(settingsBtn) || path.includes(formArea)
 
-        if(!(withinBoundaries) ) {
+        const withinBoundaries = path.includes(settingsBtn) || path.includes(formArea) 
+
+        if(!(withinBoundaries)) {
             formArea.classList.add('close')
             formArea.classList.remove('open')
         }
-    }
-
-    function removeCloseForm() {
-        document.removeEventListener('click', closeForm)
-        submitBtn.removeEventListener('click',closeForm)
     }
 
     function openForm() {
         formArea.classList.remove('close')
         formArea.classList.add('open')
         document.addEventListener('click', closeForm)
-        submitBtn.addEventListener('click',closeForm)
     }
 
 })()
@@ -55,21 +48,33 @@ const Game = (() => {
         toggleTurn: () => {return state.turn = (!state.turn)}
     })
 
-    let userOne = User('Nicco','X')
-    let userTwo = User('Enemy','O')
+
+    let userOne = User('Player 1','X')
+    let userTwo = User('Player 2','O')
     let userArray = [userOne,userTwo]
-    userArray[0].toggleTurn()
+  
+
+
+    let settingsFormInput = document.getElementById('settings-form')
+    let userOneNameInput = document.getElementById('user-one-name')
+    let userTwoNameInput = document.getElementById('user-two-name')
+    let userOneMarkInput = document.getElementById('user-one-mark')
+    let userTwoMarkInput = document.getElementById('user-two-mark')
+    let userTurnInput = document.getElementById('user-turn-button')
+    let userInputSubmit = document.getElementById('form-submit-button')
+
 
     let winConditions = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]  
     let twoPlayerBtn = document.getElementById('two-player-mode')
     let computerBtn = document.getElementById('computer-mode')
-    let settingsBtn = document.getElementById('settings-button')
     let gameText = document.getElementById('footer')
     let gameSquare = Array.from(document.getElementsByClassName('game-square'))
     let gameTurns = []
     let didWinHappen = false
+
     twoPlayerBtn.addEventListener('click',startTwoPlayerGame)
-    
+    settingsFormInput.addEventListener('submit',setUserInfo)
+    userTurnInput.addEventListener('click',swapFirstTurn)
 
     function squareClick(e) {
         if (e.target.textContent !== userOne.getMark() && e.target.textContent !== userTwo.getMark()) {
@@ -116,10 +121,7 @@ const Game = (() => {
         winConditions.forEach(winCon => {checkWinLogic(winCon)})
         if (didWinHappen === false && gameTurns.length === 9) {
             gameText.textContent = "DRAW"
-            
         }
-
-        console.log(gameTurns.length)
     } 
 
     function removeEventSquares() {
@@ -138,6 +140,7 @@ const Game = (() => {
             item.classList.remove('board-highlight');
         })
         gameText.textContent = ''
+        setUserTurns(userTurnInput.value)
     }
 
     function resetGame() {
@@ -146,6 +149,42 @@ const Game = (() => {
         didWinHappen = false
         addEventSquares()
     }
+
+    function setUserInfo(e) {
+        e.preventDefault()
+        userOne.setName(userOneNameInput.value)  
+        userTwo.setName(userTwoNameInput.value) 
+        userOne.setMark(userOneMarkInput.value) 
+        userTwo.setMark(userTwoMarkInput.value)
+        setUserTurns(userTurnInput.value)
+        userOneNameInput.value = ''
+        userTwoNameInput.value = ''
+        userOneMarkInput.value = ''
+        userTwoMarkInput.value = ''
+    }
+
+    function setUserTurns(choice) {
+        if (choice === 'userOneFirst') {
+            userOne.setTurn(true)
+            userTwo.setTurn(false)
+        } else if (choice === 'userTwoFirst') {
+            userOne.setTurn(false)
+            userTwo.setTurn(true)
+        }
+    }
+
+    function swapFirstTurn() {
+        if(userTurnInput.value === 'userOneFirst') {
+            userTurnInput.setAttribute('value','userTwoFirst')
+            userTurnInput.textContent = 'Player 2 First'  
+        } else if (userTurnInput.value === 'userTwoFirst') {
+            userTurnInput.setAttribute('value','userOneFirst')
+            userTurnInput.textContent = 'Player 1 First'
+        }
+      
+    }
+
+
 
     return Object.assign({})
 
