@@ -95,7 +95,27 @@ const Game = (() => {
 
     twoPlayerBtn.addEventListener('click', startTwoPlayerGame)
     settingsFormInput.addEventListener('submit', setUserInfo)
+    settingsFormInput.addEventListener('submit', submitResetBoard)
     userTurnInput.addEventListener('click', swapFirstTurn)
+
+    function submitResetBoard() {
+        resetGame();
+        gameSquareReset(0,'T')
+        gameSquareReset(1,'I')
+        gameSquareReset(2,'C')
+        gameSquareReset(3,'T')
+        gameSquareReset(4,'A')
+        gameSquareReset(5,'C')
+        gameSquareReset(6,'T')
+        gameSquareReset(7,'O')
+        gameSquareReset(8,'E')
+        gameText.textContent = 'Fin'
+    }
+
+    function gameSquareReset(num,txt) {
+        gameSquare[num].textContent = txt;
+        gameSquare[num].classList.remove('board-highlight');
+    }
 
 
     const getPlayerTurn = (item) => {
@@ -143,6 +163,7 @@ const Game = (() => {
             gameText.textContent = "DRAW"
         }
     }
+
 
     function removeEventSquares() {
         gameSquare.forEach((item) => {
@@ -246,6 +267,7 @@ const Game = (() => {
             if(userTurnInput.value == 'userTwoFirst') {
                 gameSquare[4].textContent = userTwo.getMark()
                 gameSquare[4].classList.add('board-highlight')
+                gameTurns.push(null)
             }
 
         }
@@ -262,7 +284,7 @@ const Game = (() => {
                 for (i = 0; i < gameSquare.length; i++) {
                     if (gameSquare[i].textContent == '') {
                         gameSquare[i].textContent = userTwo.getMark();
-                        let score = minimax(gameSquare);
+                        let score = minimax(gameSquare, 0, true);
                         gameSquare[i].textContent = '';
                         console.log(gameSquare[i])
                         if (score > bestScore) {
@@ -273,7 +295,6 @@ const Game = (() => {
                 }
                 console.log('nicco')
             }
-            console.log(i)
             gameSquare[bestMove.i].textContent = userTwo.getMark()
             gameSquare[bestMove.i].classList.add('board-highlight')
             checkWin()
@@ -283,7 +304,13 @@ const Game = (() => {
             setUserTurns('userOneFirst')
         }
         
-        function minimax(board) {
+        let scores = {
+            'userOne': 1,
+            'userTwo': 2,
+            'draw': 0
+        }
+
+        function minimax(board, depth, isMaximizing) {
             return 1;
         }
 
