@@ -32,7 +32,8 @@ const Game = (() => {
         state = {
             name,
             mark,
-            turn: false
+            turn: false,
+            winner: false
         }
 
         return Object.assign({}, userMethods(state))
@@ -59,6 +60,12 @@ const Game = (() => {
         },
         toggleTurn: () => {
             return state.turn = (!state.turn)
+        },
+        didWin: () => {
+            return state.winner
+        },
+        setWin: (win) => {
+            return state.winner = win
         }
     })
 
@@ -109,7 +116,7 @@ const Game = (() => {
         gameSquareReset(6,'T')
         gameSquareReset(7,'O')
         gameSquareReset(8,'E')
-        gameText.textContent = 'Fin'
+        gameText.textContent = ''
     }
 
     function gameSquareReset(num,txt) {
@@ -143,24 +150,29 @@ const Game = (() => {
         if (userOneWin) {
             gameText.textContent = `${userOne.getName()} has won in ${gameTurns.length} turns!`
             didWinHappen = true
-            removeEventSquares()
-            removeComputerEventSquares()
+            userOne.setWin(true);
+            removeEventSquares();
+            removeComputerEventSquares();
 
         } else if (userTwoWin) {
             gameText.textContent = `${userTwo.getName()} has won in ${gameTurns.length} turns!`
             didWinHappen = true
-            removeEventSquares()
-            removeComputerEventSquares()
+            userTwo.setWin(true);
+            removeEventSquares();
+            removeComputerEventSquares();
         }
     }
 
     function checkWin() {
-        gameTurns.push(null)
         winConditions.forEach(winCon => {
             checkWinLogic(winCon)
         })
+
+        
         if (didWinHappen === false && gameTurns.length === 9) {
             gameText.textContent = "DRAW"
+            userTwo.setWin(false);
+            userOne.setWin(false);
         }
     }
 
@@ -200,8 +212,10 @@ const Game = (() => {
         removeEventSquares()
         gameTurns = []
         didWinHappen = false
-        userOne.setTurn(false)
-        userTwo.setTurn(false)
+        userOne.setTurn(false);
+        userTwo.setTurn(false);
+        userOne.setWin(false);
+        userTwo.setWin(false);
     }
 
     function setUserInfo(e) {
@@ -247,6 +261,7 @@ const Game = (() => {
             playerTurn = userArray.filter(getPlayerTurn)
             e.target.textContent = playerTurn[0].getMark()
             updateUserArrayTurn()
+            gameTurns.push(null)
             checkWin()
         }
     }
@@ -275,43 +290,124 @@ const Game = (() => {
         function computerSquareClick(e) {
             let bestScore = -Infinity;
             let bestMove = ''
-
+        
             if (e.target.textContent !== userOne.getMark() && e.target.textContent !== userTwo.getMark()) {
-                playerTurn = userArray.filter(getPlayerTurn)
-                e.target.textContent = playerTurn[0].getMark()
-                updateUserArrayTurn()
-                checkWin()
-                for (i = 0; i < gameSquare.length; i++) {
-                    if (gameSquare[i].textContent == '') {
-                        gameSquare[i].textContent = userTwo.getMark();
-                        let score = minimax(gameSquare, 0, true);
-                        gameSquare[i].textContent = '';
-                        console.log(gameSquare[i])
+                playerTurn = userArray.filter(getPlayerTurn);
+                e.target.textContent = playerTurn[0].getMark();
+                updateUserArrayTurn();
+                gameTurns.push(null);
+                checkWinComputer();
+                if (didWinHappen === false) {
+                    for (i = 0; i < gameSquare.length; i++) {
+                        if (gameSquare[i].textContent == '') {
+                            gameSquare[i].textContent = userTwo.getMark();
+                            let score = minimax(gameSquare, 0, false);
+                            console.log(score)
+                            gameSquare[i].textContent = '';
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestMove = {i};
+                            }
+                        }
+                    }
+        
+                }
+        
+            }
+        
+            if (didWinHappen === false || (didWinHappen === true && userTwo.didWin())) {
+                gameTurns.push(null)
+                gameSquare[bestMove.i].textContent = userTwo.getMark()
+                gameSquare[bestMove.i].classList.add('board-highlight')
+            }
+            
+        }
+    
+        function skipTurn() {
+            setUserTurns('userOneFirst')
+        }
+
+        const checkWinLogicComputer = (winCon) => {
+
+            let squareTextOne = gameSquare[winCon[0]].textContent;
+            let squareTextTwo = gameSquare[winCon[1]].textContent;
+            let squareTextThree = gameSquare[winCon[2]].textContent;
+            let markOne = userOne.getMark();
+            let markTwo = userTwo.getMark();
+            let userOneWin = squareTextOne === markOne && squareTextTwo === markOne && squareTextThree === markOne;
+            let userTwoWin = squareTextOne === markTwo && squareTextTwo === markTwo && squareTextThree === markTwo;
+    
+    
+            if (userOneWin) {
+                gameText.textContent = `${userOne.getName()} has won in ${gameTurns.length} turns!`
+                userOne.setWin(true);
+            } else if (userTwoWin) {
+                gameText.textContent = `${userTwo.getName()} has won in ${gameTurns.length} turns!`
+                userTwo.setWin(true);
+            }
+        }
+    
+        function checkWinComputer() {
+            winConditions.forEach(winCon => {
+                checkWinLogicComputer(winCon)
+            })
+        }
+        
+        let scores = {
+            userOne: 10,
+            userTwo: -10,
+            draw: 0
+        } 
+
+        function minimax(board, depth, isMaximizing) {
+            
+            
+            gameTurns.push(null)
+            checkWinComputer()
+            gameTurns.pop()
+            
+           
+            
+            if (userTwo.didWin() == true) {
+                let score = 10;
+                return score
+            } else if (userOne.didWin() == true) {
+                let score = -10;
+                return score
+            } 
+
+            if (isMaximizing) {
+                let bestScore = Infinity;
+                for (i = 0; i < board.length; i++) {
+                    if (board[i].textContent == '') {
+                        board[i].textContent = userTwo.getMark();
+                        let score = minimax(board, depth + 1, false);
+                        board[i].textContent = '';
                         if (score > bestScore) {
                             bestScore = score;
                             bestMove = {i};
                         }
                     }
                 }
-                console.log('nicco')
-            }
-            gameSquare[bestMove.i].textContent = userTwo.getMark()
-            gameSquare[bestMove.i].classList.add('board-highlight')
-            checkWin()
-        }
-    
-        function skipTurn() {
-            setUserTurns('userOneFirst')
-        }
-        
-        let scores = {
-            'userOne': 1,
-            'userTwo': 2,
-            'draw': 0
-        }
 
-        function minimax(board, depth, isMaximizing) {
-            return 1;
+                return bestScore;
+
+            } else {
+                let bestScore = -Infinity;
+                for (i = 0; i < board.length; i++) {
+                    if (board[i].textContent == '') {
+                        board[i].textContent = userOne.getMark();
+                        let score = minimax(board, depth + 1, true);
+                        board[i].textContent = '';
+                        if (score < bestScore) {
+                            bestScore = score;
+                            bestMove = {i};
+                        }
+                    }
+                }
+            }
+            
+            
         }
 
     
